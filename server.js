@@ -29,7 +29,45 @@ function mainMenu() {
                 'update employee manager',
                 'exit'
             ]
-            
-        }
-    )
+        }). then(answer => {
+            switch (answer.option) {
+
+                case "view all department":
+                    viewAllDepartments();
+                    break;
+                    
+                case "view all employees":
+                    viewAllEmployees();
+                    break;
+
+                case "view all roles":
+                    viewAllRoles();
+                    break;
+
+                case "add department":
+                    addDepartment();
+                    break;
+
+                case "add employees":
+                    addEmployees();
+                    break;
+
+                case "add roles":
+                    addRoles();
+                    break;
+
+                case "update department":
+                    updateDepartment();
+                    break;
+
+                case "updateEmployeeManager":
+                    updateEmployeeManager();
+                    break;
+
+                case "Exit":
+                    connection.end()
+                    break;
+            }
+        })
+        
 }
