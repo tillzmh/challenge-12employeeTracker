@@ -108,3 +108,18 @@ function viewAllRoles(){
     )
 }
 
+function addDepartmemt(){
+    inquirer.Prompt([
+        {
+            type: "input",
+            name: "department",
+            message: "Add department name",
+        }
+    ]).then(answer =>{
+        console.log(Answers)
+        connection.query('INSERT INTO department SET?', {name: answer.department}, (err, res) => {
+            if (err) throw err;
+                mainMenu();
+            });
+    });
+};
