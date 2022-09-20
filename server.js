@@ -1,7 +1,7 @@
 const inquirer = require('inquirer');
-const sql = require('mysql2');
+const mysql = require('mysql2');
 
-const connect = mysql.createConnection({
+const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: 'password',
@@ -81,6 +81,30 @@ function viewAllDepartments() {
         console.log('view all departments')
         mainMenu();
         }
+    )
+}
+
+// function viewAllEmployees() {
+//     const sql = // TODO: ??
+//     connection.query(
+//         sql,
+//         (err, res) => {
+//             if (err) {
+//                 throw err;
+//             }
+//             mainMenu();
+//         }
+//     )
+// }
+
+function viewAllRoles(){
+    connection.query(
+        'select ro.title as Role_title ro.salary as Salary, dept.name as DepartmentName from Role ro left join department as dept.id = ro.department_id', (err, res) => {
+            if (err) {
+                throw err;
+            }
+            mainMenu();
+            }
     )
 }
 
