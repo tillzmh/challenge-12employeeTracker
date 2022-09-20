@@ -1,5 +1,5 @@
 const inquirer = require('inquirer');
-const sql = require('mysql12');
+const sql = require('mysql2');
 
 const connect = mysql.createConnection({
     host: 'localhost',
@@ -71,3 +71,16 @@ function mainMenu() {
         })
         
 }
+
+function viewAllDepartments() {
+    connection.query(
+        'SELECT * Department', (err,res) => {
+            if (err){
+            throw err;
+        }
+        console.log('view all departments')
+        mainMenu();
+        }
+    )
+}
+
