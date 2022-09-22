@@ -123,3 +123,48 @@ function addDepartmemt(){
             });
     });
 };
+//finished review role id 
+async function addEmployees() {
+    const managers = await selectManager();
+    inquirer.Prompt([{
+        name: 'firstname',
+        type: 'input',
+        message: 'Enter first name',
+    },
+    {
+        name: 'lastname',
+        type: 'input',
+        message: 'Enter last name',
+    },
+    {
+        name:'role',
+        type:'list',
+        message: 'select role',
+        choices: await selectRole()
+    },
+    {
+        name:'manager',
+        type:'list',
+        message:'Manager name',
+        choices: managers
+    }
+]).then(function(res) {
+    let roleId = res.role
+    let ManagerID = res.manager
+
+    console.log({managerID})
+
+    connection.query("INSERT INTO Employee SET?",
+        {
+            firstname: res.firstname,
+            lastname: res.lastname,
+            managerID: res.manager,
+            roleId: res.roleId, // review role ID
+        }, function (err) {
+            if (err) throw err
+            console.table(res)
+            mainMenu();
+        })
+    })
+}
+        
