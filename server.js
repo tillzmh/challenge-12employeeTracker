@@ -242,3 +242,39 @@ function selectManager() {
         })
 
 }
+
+function deleteDepartment() {
+    connection.promise().query('SELECT * FROM Department')
+        .then((res) => {
+            return res[0].map(dept => {
+                return {
+                    name: dept.name,
+                    value: dept.id
+                }
+            })
+        })
+        .then((departments) => {
+            return inquirer.prompt([
+                {
+                    type: 'list',
+                    name: 'deptId',
+                    choices: departments,
+                    message: 'Please select the department you want to delete.'
+                }
+            ])
+        })
+        .then(answer => {
+            console.log(answer);
+            return connection.promise().query('DELETE FROM Department WHERE id = ?', answer.deptId);
+
+        })
+        .then(res => {
+            console.log('Department Deleted Successfully')
+            mainMenu();
+        })
+
+        .catch(err => {
+            throw err
+        });
+
+}
