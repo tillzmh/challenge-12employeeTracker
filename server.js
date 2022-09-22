@@ -216,3 +216,29 @@ function addRoles() {
             throw err
         });
 }
+
+function selectRole() {
+    return connection.promise().query("SELECT * FROM role")
+        .then(res => {
+            return res[0].map(role => {
+                return {
+                    name: role.title,
+                    value: role.id
+                }
+            })
+        })
+}
+
+
+function selectManager() {
+    return connection.promise().query("SELECT * FROM employee ")
+        .then(res => {
+            return res[0].map(manager => {
+                return {
+                    name: `${manager.firstname} ${manager.lastname}`,
+                    value: manager.id,
+                }
+            })
+        })
+
+}
