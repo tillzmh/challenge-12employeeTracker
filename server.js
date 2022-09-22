@@ -167,4 +167,52 @@ async function addEmployees() {
         })
     })
 }
-        
+
+function addRoles() {
+    connection.promise().query("SELECT * FROM Department")
+        .then((res) => {
+            return res[0].map(dept => {
+                return {
+                    name: dept.name,
+                    value: dept.id
+                }
+            })
+        })
+        .then((departments) => {
+
+            return inquirer.prompt([
+
+                {
+                    type: 'input',
+                    name: 'roles',
+                    message: 'Please add a role:'
+                },
+
+                {
+                    type: 'input',
+                    name: 'salary',
+                    message: 'Please enter a salary:'
+                },
+
+                {
+                    type: 'list',
+                    name: 'depts',
+                    choices: departments,
+                    message: 'Please select your department.'
+                }
+            ])
+        })
+
+        .then(answer => {
+            console.log(answer);
+            return connection.promise().query('INSERT INTO role SET ?', { title: answer.roles, salary: answer.salary, department_id: answer.depts });
+        })
+        .then(res => {
+            console.log('Added new role')
+            mainMenu();
+
+        })
+        .catch(err => {
+            throw err
+        });
+}
