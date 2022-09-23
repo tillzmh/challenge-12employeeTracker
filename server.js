@@ -5,7 +5,7 @@ const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: 'password',
-    database: 'Employee_Tracker',
+    database: 'employee_tracker',
 });
 
 connection.connect();
@@ -309,6 +309,42 @@ function deleteEmployee() {
             mainMenu();
         })
 
+        .catch(err => {
+            throw err
+        });
+
+}
+
+function deleteRole() {
+    connection.promise().query('SELECT title, id FROM role')
+        .then((res) => {
+
+            return res[0].map(roles => {
+                return {
+                    name: roles.title,
+                    value: roles.id
+                }
+            })
+        })
+        .then((employeeRoles) => {
+            return inquirer.prompt([
+                {
+                    type: 'list',
+                    name: 'roleId',
+                    choices: employeeRoles,
+                    message: 'Please select employee you want to delete.'
+                }
+            ])
+        })
+        .then(answer => {
+            console.log(answer);
+            return connection.promise().query('DELETE FROM Role WHERE id = ?', answer.roleId);
+
+        })
+        .then(res => {
+            console.log('Role Deleted Successfully')
+            mainMenu();
+        })
         .catch(err => {
             throw err
         });
