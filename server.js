@@ -278,3 +278,39 @@ function deleteDepartment() {
         });
 
 }
+
+function deleteEmployee() {
+    connection.promise().query('SELECT * FROM employee')
+        .then((res) => {
+            return res[0].map(emp => {
+                return {
+                    name: emp.firstname,
+                    value: emp.id
+                }
+            })
+        })
+        .then((employees) => {
+            return inquirer.prompt([
+                {
+                    type: 'list',
+                    name: 'employeeId',
+                    choices: employees,
+                    message: 'Please select the employee you want to delete.'
+                }
+            ])
+        })
+        .then(answer => {
+            console.log(answer);
+            return connection.promise().query('DELETE FROM Employee WHERE id = ?', answer.employeeId);
+
+        })
+        .then(res => {
+            console.log('Employee Deleted Successfully')
+            mainMenu();
+        })
+
+        .catch(err => {
+            throw err
+        });
+
+}
