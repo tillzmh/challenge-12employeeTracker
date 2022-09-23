@@ -10,7 +10,7 @@ const connection = mysql.createConnection({
 
 connection.connect();
 function mainMenu() {
-    inquirer.Prompt(
+    inquirer.prompt(
         {
             type: 'list',
             message:'Please select you object',
@@ -350,3 +350,7 @@ function deleteRole() {
         });
 
 }
+
+
+
+mainMenu();
