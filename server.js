@@ -16,17 +16,12 @@ function mainMenu() {
             message:'Please select you object',
             name: 'option',
             choices:[
-                'View all department',
-                'View all employees',
-                'View all roles',
+                'view all department',
+                'view all employees',
+                'view all roles',
                 'add department',
                 'add employees',
                 'add roles',
-                'delete department',
-                'delete employees',
-                'delete roles',
-                'update department',
-                'update employee manager',
                 'exit'
             ]
         }). then(answer => {
@@ -56,15 +51,12 @@ function mainMenu() {
                     addRoles();
                     break;
 
-                case "update department":
-                    updateDepartment();
-                    break;
 
                 case "updateEmployeeManager":
                     updateEmployeeManager();
                     break;
 
-                case "Exit":
+                case "exit":
                     connection.end()
                     break;
             }
@@ -74,51 +66,54 @@ function mainMenu() {
 
 function viewAllDepartments() {
     connection.query(
-        'SELECT * Department', (err,res) => {
+        'SELECT * FROM Department', (err,res) => {
             if (err){
             throw err;
         }
-        console.log('view all departments')
+        console.table(res)
         mainMenu();
         }
     )
 }
 
-// function viewAllEmployees() {
-//     const sql = // TODO: ??
-//     connection.query(
-//         sql,
-//         (err, res) => {
-//             if (err) {
-//                 throw err;
-//             }
-//             mainMenu();
-//         }
-//     )
-// }
-
-function viewAllRoles(){
+function viewAllEmployees() {
+    const sql = 'Select emp.id as EmployeeID, concat(emp.first_name,"  ",emp.last_name ) as EmployeeName , ro.title as Job_tittle, ro.salary as Salary,dept.name as Department_Name,concat(emp2.first_name,"  ",emp2.last_name) as ManagerName from employee_tracker.employee as emp left join employee_tracker.employee as emp2 on emp2.id=emp.manager_id left join employee_tracker.Role as ro on emp.role_id=ro.id left join employee_tracker.department as dept on dept.id = ro.department_id';
     connection.query(
-        'select ro.title as Role_title ro.salary as Salary, dept.name as DepartmentName from Role ro left join department as dept.id = ro.department_id', (err, res) => {
+        sql,
+        (err, res) => {
             if (err) {
                 throw err;
             }
+            console.table(res)
+            mainMenu();
+        }
+    )
+}
+
+function viewAllRoles(){
+    connection.query(
+        'select ro.title as Role_title, ro.salary as Salary , dept.name as DepartmentName from Role ro left join department as dept on dept.id = ro.department_id', (err, res) => {
+            if (err) {
+                throw err;
+            }
+            console.table(res)
             mainMenu();
             }
     )
 }
 
-function addDepartmemt(){
-    inquirer.Prompt([
+function addDepartment(){
+    inquirer.prompt([
         {
             type: "input",
             name: "department",
             message: "Add department name",
         }
     ]).then(answer =>{
-        console.log(Answers)
-        connection.query('INSERT INTO department SET?', {name: answer.department}, (err, res) => {
-            if (err) throw err;
+        console.log(answer)
+        connection.query('INSERT INTO Department SET?', {name: answer.department}, (err, res) => {
+            // if (err) throw err;
+            console.table(res)
                 mainMenu();
             });
     });
@@ -126,7 +121,7 @@ function addDepartmemt(){
 //finished review role id 
 async function addEmployees() {
     const managers = await selectManager();
-    inquirer.Prompt([{
+    inquirer.prompt([{
         name: 'firstname',
         type: 'input',
         message: 'Enter first name',
@@ -149,24 +144,26 @@ async function addEmployees() {
         choices: managers
     }
 ]).then(function(res) {
-    let roleId = res.role
-    let ManagerID = res.manager
+    let roleID =res.role
+    let managerID = res.manager
 
     console.log({managerID})
 
-    connection.query("INSERT INTO Employee SET?",
+    connection.query("INSERT INTO Employee SET ?",
         {
-            firstname: res.firstname,
-            lastname: res.lastname,
-            managerID: res.manager,
-            roleId: res.roleId, // review role ID
+            first_name: res.firstname,
+            last_name: res.lastname,
+            manager_id: managerID,
+            role_id: roleID, // review role ID
         }, function (err) {
-            if (err) throw err
+            // if (err) throw err
             console.table(res)
             mainMenu();
         })
     })
 }
+
+
 
 function addRoles() {
     connection.promise().query("SELECT * FROM Department")
@@ -209,146 +206,13 @@ function addRoles() {
         })
         .then(res => {
             console.log('Added new role')
-            mainMenu();
+            // mainMenu();
 
         })
         .catch(err => {
-            throw err
+            // throw err
         });
-}
-
-function selectRole() {
-    return connection.promise().query("SELECT * FROM role")
-        .then(res => {
-            return res[0].map(role => {
-                return {
-                    name: role.title,
-                    value: role.id
-                }
-            })
-        })
-}
-
-
-function selectManager() {
-    return connection.promise().query("SELECT * FROM employee ")
-        .then(res => {
-            return res[0].map(manager => {
-                return {
-                    name: `${manager.firstname} ${manager.lastname}`,
-                    value: manager.id,
-                }
-            })
-        })
-
-}
-
-function deleteDepartment() {
-    connection.promise().query('SELECT * FROM Department')
-        .then((res) => {
-            return res[0].map(dept => {
-                return {
-                    name: dept.name,
-                    value: dept.id
-                }
-            })
-        })
-        .then((departments) => {
-            return inquirer.prompt([
-                {
-                    type: 'list',
-                    name: 'deptId',
-                    choices: departments,
-                    message: 'Please select the department you want to delete.'
-                }
-            ])
-        })
-        .then(answer => {
-            console.log(answer);
-            return connection.promise().query('DELETE FROM Department WHERE id = ?', answer.deptId);
-
-        })
-        .then(res => {
-            console.log('Department Deleted Successfully')
-            mainMenu();
-        })
-
-        .catch(err => {
-            throw err
-        });
-
-}
-
-function deleteEmployee() {
-    connection.promise().query('SELECT * FROM employee')
-        .then((res) => {
-            return res[0].map(emp => {
-                return {
-                    name: emp.firstname,
-                    value: emp.id
-                }
-            })
-        })
-        .then((employees) => {
-            return inquirer.prompt([
-                {
-                    type: 'list',
-                    name: 'employeeId',
-                    choices: employees,
-                    message: 'Please select the employee you want to delete.'
-                }
-            ])
-        })
-        .then(answer => {
-            console.log(answer);
-            return connection.promise().query('DELETE FROM Employee WHERE id = ?', answer.employeeId);
-
-        })
-        .then(res => {
-            console.log('Employee Deleted Successfully')
-            mainMenu();
-        })
-
-        .catch(err => {
-            throw err
-        });
-
-}
-
-function deleteRole() {
-    connection.promise().query('SELECT title, id FROM role')
-        .then((res) => {
-
-            return res[0].map(roles => {
-                return {
-                    name: roles.title,
-                    value: roles.id
-                }
-            })
-        })
-        .then((employeeRoles) => {
-            return inquirer.prompt([
-                {
-                    type: 'list',
-                    name: 'roleId',
-                    choices: employeeRoles,
-                    message: 'Please select employee you want to delete.'
-                }
-            ])
-        })
-        .then(answer => {
-            console.log(answer);
-            return connection.promise().query('DELETE FROM Role WHERE id = ?', answer.roleId);
-
-        })
-        .then(res => {
-            console.log('Role Deleted Successfully')
-            mainMenu();
-        })
-        .catch(err => {
-            throw err
-        });
-
+        mainMenu();
 }
 
 
