@@ -206,7 +206,7 @@ function addRoles() {
         })
         .then(res => {
             console.log('Added new role')
-            // mainMenu();
+            mainMenu();
 
         })
         .catch(err => {
@@ -215,6 +215,33 @@ function addRoles() {
         mainMenu();
 }
 
+
+
+function selectRole() {
+    return connection.promise().query("SELECT * FROM role")
+        .then(res => {
+            return res[0].map(role => {
+                return {
+                    name: role.title,
+                    value: role.id
+                }
+            })
+        })
+}
+
+
+function selectManager() {
+    return connection.promise().query("SELECT * FROM employee ")
+        .then(res => {
+            return res[0].map(manager => {
+                return {
+                    name: `${manager.firstname} ${manager.lastname}`,
+                    value: manager.id,
+                }
+            })
+        })
+
+}
 
 
 mainMenu();
